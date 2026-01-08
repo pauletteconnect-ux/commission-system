@@ -1,0 +1,13 @@
+{
+  "name": "commission-system",
+  "version": "1.0.0",
+  "description": "Commission Tracking System",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "googleapis": "^120.0.0",
+    "node-cache": "^5.1.2"
+  }
+}
