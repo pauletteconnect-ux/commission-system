@@ -8,6 +8,10 @@ const cache = new NodeCache({ stdTTL: 300 });
 // 辅助函数：安全解析环境变量中的JSON
 function parseGoogleCredentials(credString) {
   try {
+    if (!credString) {
+      throw new Error('凭证字符串为空');
+    }
+    
     // 如果字符串已经是JSON，直接解析
     if (credString.trim().startsWith('{')) {
       return JSON.parse(credString);
@@ -85,9 +89,44 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // 获取查询参数
     const params = event.queryStringParameters || {};
-    const body = event.body ? JSON.parse(event.body) : {};
-    const action = params.action || body.action;
+    
+    // 解析请求体（支持JSON和表单格式）
+    let body = {};
+    if (event.body) {
+      const contentType = event.headers['content-type'] || event.headers['Content-Type'] || '';
+      
+      if (contentType.includes('application/json')) {
+        // JSON格式
+        try {
+          body = JSON.parse(event.body);
+        } catch (e) {
+          console.error('解析JSON失败:', e.message);
+        }
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        // 表单格式（如：action=adminLogin&username=admin&password=admin123）
+        const qs = require('querystring');
+        body = qs.parse(event.body);
+      } else {
+        // 默认尝试解析JSON
+        try {
+          body = JSON.parse(event.body);
+        } catch (e) {
+          // 如果不是JSON，尝试解析为查询字符串
+          try {
+            const qs = require('querystring');
+            body = qs.parse(event.body);
+          } catch (e2) {
+            console.error('解析请求体失败:', e2.message);
+          }
+        }
+      }
+    }
+    
+    // 合并参数，body中的参数优先
+    const allParams = { ...params, ...body };
+    const action = allParams.action;
     
     let response;
     
@@ -99,7 +138,7 @@ exports.handler = async (event, context) => {
         response = await getCategories();
         break;
       case 'getUserCommissions':
-        response = await getUserCommissions(params.userId);
+        response = await getUserCommissions(allParams.userId);
         break;
       case 'getAdminStats':
         response = await getAdminStats();
@@ -108,25 +147,48 @@ exports.handler = async (event, context) => {
         response = await createAnonymousUser();
         break;
       case 'adminLogin':
-        response = await adminLogin(params.username, params.password);
+        response = await adminLogin(allParams.username, allParams.password);
         break;
       case 'getSettings':
         response = await getSettings();
         break;
       case 'importProducts':
-        response = await importProducts(params.data);
+        response = await importProducts(allParams.data);
         break;
       case 'addProduct':
-        response = await addProduct(params);
+        response = await addProduct(allParams);
+        break;
+      case 'updateProduct':
+        response = await updateProduct(allParams);
+        break;
+      case 'deleteProduct':
+        response = await deleteProduct(allParams.productId);
+        break;
+      case 'addCategory':
+        response = await addCategory(allParams.name);
+        break;
+      case 'getUsers':
+        response = await getUsers();
+        break;
+      case 'exportData':
+        response = await exportData(allParams.type);
+        break;
+      case 'saveSettings':
+        response = await saveSettings(allParams.settings);
+        break;
+      case 'diagnose':
+        response = await diagnoseSystem();
         break;
       default:
         response = { 
           success: false, 
-          message: '操作不存在或未实现',
+          message: '操作不存在',
           availableActions: [
             'getProducts', 'getCategories', 'getUserCommissions',
             'getAdminStats', 'createAnonymousUser', 'adminLogin',
-            'getSettings', 'importProducts', 'addProduct'
+            'getSettings', 'importProducts', 'addProduct',
+            'updateProduct', 'deleteProduct', 'addCategory',
+            'getUsers', 'exportData', 'saveSettings', 'diagnose'
           ]
         };
     }
@@ -150,6 +212,68 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// 系统诊断函数
+async function diagnoseSystem() {
+  const diagnostics = {
+    environmentVariables: {
+      GOOGLE_CREDENTIALS: process.env.GOOGLE_CREDENTIALS ? '已设置' : '未设置',
+      SPREADSHEET_ID: process.env.SPREADSHEET_ID || '未设置',
+      SPREADSHEET_ID_LENGTH: process.env.SPREADSHEET_ID ? process.env.SPREADSHEET_ID.length : 0,
+      ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ? '已设置' : '未设置'
+    },
+    googleCredentials: {
+      isValid: false,
+      parsed: null,
+      error: null
+    },
+    sheetsAccess: {
+      canAccess: false,
+      error: null
+    },
+    serverInfo: {
+      nodeVersion: process.version,
+      timestamp: new Date().toISOString()
+    }
+  };
+  
+  // 尝试解析Google凭证
+  try {
+    if (process.env.GOOGLE_CREDENTIALS) {
+      const credentials = parseGoogleCredentials(process.env.GOOGLE_CREDENTIALS);
+      diagnostics.googleCredentials.isValid = true;
+      diagnostics.googleCredentials.parsed = {
+        client_email: credentials.client_email,
+        project_id: credentials.project_id
+      };
+    }
+  } catch (error) {
+    diagnostics.googleCredentials.error = error.message;
+    diagnostics.googleCredentials.parsed = process.env.GOOGLE_CREDENTIALS ? 
+      process.env.GOOGLE_CREDENTIALS.substring(0, 100) + '...' : '空';
+  }
+  
+  // 尝试访问Google Sheets
+  try {
+    if (diagnostics.googleCredentials.isValid && process.env.SPREADSHEET_ID) {
+      const sheets = getSheets();
+      const response = await sheets.spreadsheets.get({
+        spreadsheetId: process.env.SPREADSHEET_ID,
+        fields: 'properties.title,sheets.properties'
+      });
+      diagnostics.sheetsAccess.canAccess = true;
+      diagnostics.sheetsAccess.title = response.data.properties.title;
+      diagnostics.sheetsAccess.sheets = response.data.sheets.map(s => s.properties.title);
+    }
+  } catch (error) {
+    diagnostics.sheetsAccess.error = error.message;
+  }
+  
+  return {
+    success: true,
+    diagnostics: diagnostics
+  };
+}
 
 // 获取所有产品
 async function getProducts() {
@@ -221,7 +345,7 @@ async function getProducts() {
     return result;
   } catch (error) {
     console.error('获取产品失败:', error);
-    // 返回测试数据
+    // 返回演示数据
     return {
       success: true,
       data: [
@@ -380,6 +504,35 @@ async function importProducts(data) {
 
 async function addProduct(params) {
   return { success: true, productId: 999, message: '功能暂不可用' };
+}
+
+async function updateProduct(params) {
+  return { success: true, message: '功能暂不可用' };
+}
+
+async function deleteProduct(productId) {
+  return { success: true, message: '功能暂不可用' };
+}
+
+async function addCategory(name) {
+  return { success: true, message: '功能暂不可用' };
+}
+
+async function getUsers() {
+  return { success: true, data: [] };
+}
+
+async function exportData(type) {
+  return { success: false, message: '功能暂不可用' };
+}
+
+async function saveSettings(settingsStr) {
+  try {
+    const settings = JSON.parse(settingsStr);
+    return { success: true, message: '设置保存成功（演示模式）' };
+  } catch (e) {
+    return { success: false, message: '解析设置失败' };
+  }
 }
 
 // 辅助函数
