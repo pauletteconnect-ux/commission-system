@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 
 // ============= 配置区（请修改）=============
-const SPREADSHEET_ID = '1oPHKFBEM...'; // 替换成你真实的 Sheet ID
+const SPREADSHEET_ID = '1oPHKFBEMmybpYX3DcbVOt0kIWYXvRyXe6yVv4WlrFQ8'; // 替换成你真实的 Sheet ID
 const SHEET_NAMES = {
     PRODUCTS: 'Products',   // 产品表名
     CATEGORIES: 'Categories' // 分类表名
