@@ -150,6 +150,7 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             position: relative;
+            cursor: pointer;
         }
         
         .product-badge {
@@ -444,6 +445,7 @@
             padding: 5px;
             cursor: pointer;
             flex: 1;
+            transition: color 0.3s;
         }
         
         .nav-item.active {
@@ -478,6 +480,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
         }
         
         .floating-btn.like-btn { color: #e91e63; }
@@ -672,6 +679,10 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
+        .admin-tab-content {
+            margin-top: 20px;
+        }
+        
         /* 数据分析样式 */
         .time-filter {
             display: flex;
@@ -689,6 +700,7 @@
             font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
+            transition: all 0.3s;
         }
         
         .time-btn.active {
@@ -898,6 +910,9 @@
             <div class="showcase-title">🎁 Eksklusif Member / Member Exclusive</div>
             <div class="product-card" id="memberShowcase">
                 <!-- 通过JS动态加载 -->
+                <div style="text-align: center; padding: 50px 20px; color: #666;">
+                    <p>Memuat produk eksklusif...</p>
+                </div>
             </div>
         </div>
         
@@ -906,12 +921,21 @@
             <div class="showcase-title">🔥 Hot Sale / Laris</div>
             <div class="product-card" id="hotSaleShowcase">
                 <!-- 通过JS动态加载 -->
+                <div style="text-align: center; padding: 50px 20px; color: #666;">
+                    <p>Memuat produk hot sale...</p>
+                </div>
             </div>
         </div>
         
         <!-- 产品列表 -->
-        <div class="product-list" id="productList">
-            <!-- 通过JS动态加载 -->
+        <div class="showcase-container">
+            <div class="showcase-title">🛒 Semua Produk / All Products</div>
+            <div class="product-list" id="productList">
+                <!-- 通过JS动态加载 -->
+                <div style="text-align: center; padding: 50px 20px; color: #666;">
+                    <p>Memuat daftar produk...</p>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -924,7 +948,22 @@
         
         <!-- 佣金统计 -->
         <div class="commission-stats" id="commissionStats">
-            <!-- 通过JS动态加载 -->
+            <div class="stat-card">
+                <div class="stat-label-large">Total Komisi / Total Commission</div>
+                <div class="stat-value-large">Rp 0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label-large">Pending / Menunggu</div>
+                <div class="stat-value-large">Rp 0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label-large">Sudah Dibayar / Paid</div>
+                <div class="stat-value-large">Rp 0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label-large">Jumlah Referral / Referral Count</div>
+                <div class="stat-value-large">0</div>
+            </div>
         </div>
         
         <!-- 佣金记录 -->
@@ -937,7 +976,9 @@
                 <div>Tanggal / Date</div>
             </div>
             <div id="commissionRecords">
-                <!-- 通过JS动态加载 -->
+                <div style="text-align: center; padding: 30px; color: #666;">
+                    <p>Belum ada riwayat komisi. / No commission history yet.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -959,7 +1000,44 @@
         
         <!-- 订单管理 -->
         <div id="adminOrders" class="admin-tab-content">
-            <!-- 通过JS动态加载 -->
+            <div class="commission-stats">
+                <div class="stat-card">
+                    <div class="stat-label-large">Total Penjualan / Total Sales</div>
+                    <div class="stat-value-large">Rp 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label-large">Total Komisi / Total Commission</div>
+                    <div class="stat-value-large">Rp 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label-large">Jumlah Pengguna / User Count</div>
+                    <div class="stat-value-large">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label-large">Jumlah Pesanan / Order Count</div>
+                    <div class="stat-value-large">0</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="margin-bottom: 15px; color: #333;">Instruksi Admin / Admin Instructions</h3>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                    <p style="margin-bottom: 10px; color: #666;"><strong>1. Tambahkan WhatsApp ke Pesanan / Add WhatsApp to Orders:</strong></p>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        Buka Google Sheets → Orders sheet → Tambahkan nomor WhatsApp di kolom "SharerWhatsApp"
+                    </p>
+                    
+                    <p style="margin-bottom: 10px; color: #666;"><strong>2. Kirim Password ke Pengguna / Send Password to Users:</strong></p>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        Buka Google Sheets → Users sheet → Isi kolom "Password" dan ubah "HasCommission" ke TRUE
+                    </p>
+                    
+                    <p style="margin-bottom: 10px; color: #666;"><strong>3. Kelola Produk / Manage Products:</strong></p>
+                    <p style="font-size: 13px; color: #666;">
+                        Buka Google Sheets → Products sheet → Ubah "IsVisible" ke TRUE/FALSE untuk menampilkan/sembunyikan produk
+                    </p>
+                </div>
+            </div>
         </div>
         
         <!-- 数据分析 -->
@@ -989,7 +1067,38 @@
             
             <!-- 统计概览 -->
             <div id="statsOverview" class="stats-grid">
-                <!-- 通过JS动态加载 -->
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Total Exposure / Paparan</div>
+                    <div class="stat-value-sm">0</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Total Clicks / Klik</div>
+                    <div class="stat-value-sm">0</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Total Shares / Bagikan</div>
+                    <div class="stat-value-sm">0</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Total Likes / Suka</div>
+                    <div class="stat-value-sm">0</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Total Purchases / Pembelian</div>
+                    <div class="stat-value-sm">0</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Click Rate (CTR)</div>
+                    <div class="stat-value-sm">0%</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Share Rate</div>
+                    <div class="stat-value-sm">0%</div>
+                </div>
+                <div class="stat-card-sm">
+                    <div class="stat-label-sm">Conversion Rate</div>
+                    <div class="stat-value-sm">0%</div>
+                </div>
             </div>
             
             <!-- 每日统计图表 -->
@@ -1034,7 +1143,11 @@
                             </tr>
                         </thead>
                         <tbody id="productStatsBody">
-                            <!-- 通过JS动态加载 -->
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
+                                    Tidak ada data statistik / No statistics data available
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -1197,12 +1310,14 @@
     <div class="modal" id="productDetailModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="productDetailTitle"></h2>
+                <h2 class="modal-title" id="productDetailTitle">Product Details</h2>
                 <button class="close-btn" id="closeProductDetail">&times;</button>
             </div>
             <div class="modal-body" style="padding: 0;">
                 <div id="productDetailContent">
-                    <!-- 产品详情通过JS动态加载 -->
+                    <div style="text-align: center; padding: 50px 20px; color: #666;">
+                        <p>Memuat detail produk...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1217,7 +1332,10 @@
             </div>
             <div class="modal-body">
                 <div id="shareProductInfo" class="mb-20">
-                    <!-- 分享产品信息 -->
+                    <div style="text-align: center;">
+                        <p style="font-weight: 600; font-size: 16px; margin-bottom: 5px;">Product Name</p>
+                        <p style="color: #666; font-size: 14px;">Komisi yang bisa didapat / Commission available:</p>
+                    </div>
                 </div>
                 
                 <div class="mb-15">
@@ -1377,9 +1495,13 @@
         // ============= 数据加载 =============
         async function loadData() {
             try {
+                console.log('Loading data...');
+                
                 // 加载分类
                 const categoriesResponse = await fetch(`${CONFIG.API_URL}?action=getCategories`);
                 const categoriesData = await categoriesResponse.json();
+                console.log('Categories data:', categoriesData);
+                
                 if (categoriesData.success) {
                     categories = categoriesData.data;
                     renderCategories();
@@ -1388,9 +1510,13 @@
                 // 加载产品
                 const productsResponse = await fetch(`${CONFIG.API_URL}?action=getProducts`);
                 const productsData = await productsResponse.json();
+                console.log('Products data:', productsData);
+                
                 if (productsData.success) {
                     products = productsData.data;
                     renderHomePage();
+                } else {
+                    console.error('Failed to load products:', productsData);
                 }
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -1401,14 +1527,16 @@
         // ============= 页面渲染 =============
         function renderCategories() {
             const categoriesNav = document.getElementById('categoriesNav');
-            if (!categoriesNav || categories.length === 0) return;
+            if (!categoriesNav) return;
             
             let html = '';
             html += `<button class="category-btn active" data-category="all">Semua / All</button>`;
             
-            categories.forEach(category => {
-                html += `<button class="category-btn" data-category="${category.ID}">${category.Name}</button>`;
-            });
+            if (categories && categories.length > 0) {
+                categories.forEach(category => {
+                    html += `<button class="category-btn" data-category="${category.ID}">${category.Name}</button>`;
+                });
+            }
             
             categoriesNav.innerHTML = html;
             
@@ -1430,6 +1558,13 @@
         }
         
         function renderHomePage() {
+            console.log('Rendering home page with products:', products);
+            
+            if (!products || products.length === 0) {
+                console.warn('No products available');
+                return;
+            }
+            
             // 渲染会员专属产品
             const memberProduct = products.find(p => p.IsMemberExclusive === true && p.IsVisible !== false);
             const memberShowcase = document.getElementById('memberShowcase');
@@ -1437,7 +1572,7 @@
                 memberShowcase.innerHTML = `
                     <div class="member-badge product-badge">MEMBER EKSKLUSIF / EXCLUSIVE</div>
                     <div class="product-image-container">
-                        <img src="${memberProduct.ImageURL || ''}" alt="${memberProduct.Name}" class="product-image">
+                        <img src="${memberProduct.ImageURL || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="${memberProduct.Name}" class="product-image">
                     </div>
                     <div class="product-info">
                         <div class="product-name">${memberProduct.Name}</div>
@@ -1478,7 +1613,7 @@
                 hotSaleShowcase.innerHTML = `
                     <div class="hot-badge product-badge">HOT SALE</div>
                     <div class="product-image-container">
-                        <img src="${hotProduct.ImageURL || ''}" alt="${hotProduct.Name}" class="product-image">
+                        <img src="${hotProduct.ImageURL || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="${hotProduct.Name}" class="product-image">
                     </div>
                     <div class="product-info">
                         <div class="product-name">${hotProduct.Name}</div>
@@ -1518,6 +1653,7 @@
                 p.IsHotSale !== true && 
                 p.IsVisible !== false
             );
+            
             renderProductList(regularProducts);
         }
         
@@ -1525,7 +1661,7 @@
             const productListContainer = document.getElementById('productList');
             if (!productListContainer) return;
             
-            if (productList.length === 0) {
+            if (!productList || productList.length === 0) {
                 productListContainer.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; color: #666;">
                         <p>Tidak ada produk tersedia. / No products available.</p>
@@ -1556,7 +1692,7 @@
                     <div class="product-card" data-id="${product.ID}">
                         ${badge}
                         <div class="product-image-container">
-                            <img src="${product.ImageURL || ''}" alt="${product.Name}" class="product-image">
+                            <img src="${product.ImageURL || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="${product.Name}" class="product-image">
                         </div>
                         <div class="product-info">
                             <div class="product-name">${product.Name}</div>
@@ -1633,7 +1769,10 @@
             await recordProductStat(productId, 'click');
             
             currentProduct = products.find(p => p.ID === productId);
-            if (!currentProduct) return;
+            if (!currentProduct) {
+                alert('Produk tidak ditemukan. / Product not found.');
+                return;
+            }
             
             // 显示产品详情模态框
             const modal = document.getElementById('productDetailModal');
@@ -1659,7 +1798,7 @@
                                 <source src="${currentProduct.VideoURL}" type="video/mp4">
                                 Browser tidak mendukung video. / Browser doesn't support video.
                             </video>` :
-                            `<img src="${currentProduct.ImageURL || ''}" alt="${currentProduct.Name}" class="product-main-image">`
+                            `<img src="${currentProduct.ImageURL || 'https://via.placeholder.com/400x250?text=No+Image'}" alt="${currentProduct.Name}" class="product-main-image">`
                         }
                     </div>
                     
@@ -1943,11 +2082,11 @@
                 } else {
                     // 登录失败
                     let errorMsg = 'Login gagal. / Login failed.';
-                    if (data.message.includes('no commission')) {
+                    if (data.message && data.message.includes('no commission')) {
                         errorMsg = 'Belum ada komisi. Password akan dikirim via WhatsApp saat Anda memiliki komisi. / No commission yet. Password will be sent via WhatsApp when you have commission.';
-                    } else if (data.message.includes('not found')) {
+                    } else if (data.message && data.message.includes('not found')) {
                         errorMsg = 'Nomor WhatsApp tidak ditemukan. / WhatsApp number not found.';
-                    } else if (data.message.includes('Incorrect password')) {
+                    } else if (data.message && data.message.includes('Incorrect password')) {
                         errorMsg = 'Password salah. Hubungi support jika lupa password. / Incorrect password. Contact support if forgot password.';
                     }
                     
@@ -2882,7 +3021,8 @@
                     });
                     
                     const tabId = this.dataset.tab;
-                    document.getElementById('admin' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.remove('hidden');
+                    const targetId = 'admin' + tabId.charAt(0).toUpperCase() + tabId.slice(1);
+                    document.getElementById(targetId).classList.remove('hidden');
                     
                     // 如果是分析页面，加载数据
                     if (tabId === 'analytics' && isAdmin) {
